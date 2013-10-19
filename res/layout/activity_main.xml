@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"  
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/mp1"
+    />
+
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/T"
+    />
+    
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/xA"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/yA"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/zA"
+    />    
+
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/xG"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/yG"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/zG"
+    />   
+    
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/xM"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/yM"
+    />
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/zM"
+    />    
+    
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/L"
+    />    
+
+<TextView  
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/C"
+    />
+
+</LinearLayout>
