@@ -188,6 +188,8 @@ public class SecondActivity extends Activity implements SensorEventListener {
 //					break;
 //				default:
 //					break;
+				     //
+				
 				
 				}
 	}
