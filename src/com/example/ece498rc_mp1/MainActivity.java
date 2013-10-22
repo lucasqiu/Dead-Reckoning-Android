@@ -44,13 +44,20 @@ public class MainActivity extends Activity implements SensorEventListener {
 	
 	File f;
 	long etime;
-	int steps = 0;
-	float thresholdp = (float)14;
-	float thresholdn = (float)5;
-	float[] history = new float[5];
+
+	int samplesize = 30;
+	boolean testStep = false;
+	float UpperThreshold = (float)14;
+	float LowerThreshold = (float)5;
+	float[] history = new float[samplesize];
 	int[] doubleturn = new int[2];
 	int next = 0;
 	
+	int windowSize = 5;
+	float stableThreshold;
+	int steps = 0;	
+	float step_length = 0;
+
 //	CSV csv = CSV
 //		    .separator(',')  // delimiter of fields
 //		    .quote('"')      // quote character
@@ -99,12 +106,15 @@ public class MainActivity extends Activity implements SensorEventListener {
 					AviewX.setText("Accel_x: " + event.values[0]);
 					AviewY.setText("Accel_y: " + event.values[1]);
 					AviewZ.setText("Accel_z: " + event.values[2]);
-					
-					counter(event.values[2]);
-					
+
+					if(testStep == true)
+						countSteps(event.values[2], stableThreshold);
+					else if (next == 30) //make sure history array is full and do not overwrite previous data
+						testUserStep();
+
 					history[next] = event.values[2];
 					next++;
-					if (next==5) 
+					if (next==30) 
 						next = 0;
 					
 					
@@ -122,71 +132,71 @@ public class MainActivity extends Activity implements SensorEventListener {
 				        System.out.println("Exception");
 				    } 
 					break;
-//				case Sensor.TYPE_GYROSCOPE:
-//					GviewX.setText("Gyro_x: " + event.values[0]);
-//					GviewY.setText("Gyro_y: " + event.values[1]);
-//					GviewZ.setText("Gyro_z: " + event.values[2]);
+				case Sensor.TYPE_GYROSCOPE:
+					GviewX.setText("Gyro_x: " + event.values[0]);
+					GviewY.setText("Gyro_y: " + event.values[1]);
+					GviewZ.setText("Gyro_z: " + event.values[2]);
 					
-//					String datastringG = "G:," + Float.toString(event.values[0]) + "," + Float.toString(event.values[1]) + "," + Float.toString(event.values[2])+","+Long.toString(etime);
-//					//GArray.add(datastringG);
-//					try {
-//						FileWriter fr = new FileWriter(f, true);
-//						BufferedWriter out = new BufferedWriter(fr);
-//							out.write(datastringG);
-//							out.newLine();
-//							out.flush();
-//							out.close();
-//					}
-//				    catch (IOException e) {
-//				        System.out.println("Exception");
-//				    } 
+					String datastringG = "G:," + Float.toString(event.values[0]) + "," + Float.toString(event.values[1]) + "," + Float.toString(event.values[2])+","+Long.toString(etime);
+					//GArray.add(datastringG);
+					try {
+						FileWriter fr = new FileWriter(f, true);
+						BufferedWriter out = new BufferedWriter(fr);
+							out.write(datastringG);
+							out.newLine();
+							out.flush();
+							out.close();
+					}
+				    catch (IOException e) {
+				        System.out.println("Exception");
+				    } 
+					
+					break;
+				case Sensor.TYPE_MAGNETIC_FIELD:
+					MviewX.setText("Mag_x: " + event.values[0]);
+					MviewY.setText("Mag_y: " + event.values[1]);
+					MviewZ.setText("Mag_z: " + event.values[2]);
+					
+					String datastringM = "M: " +","+ Float.toString(event.values[0]) + "," + Float.toString(event.values[1]) + "," + Float.toString(event.values[2])+","+String.valueOf(etime);
+				//	GArray.add(datastringM);
+					
+//					//Writer out = new FileWriter("sensordata1.csv");
 //					
-//					break;
-//				case Sensor.TYPE_MAGNETIC_FIELD:
-//					MviewX.setText("Mag_x: " + event.values[0]);
-//					MviewY.setText("Mag_y: " + event.values[1]);
-//					MviewZ.setText("Mag_z: " + event.values[2]);
+//					CSVWriter<Float> csvwriter = new CSVWriterBuilder<Float>(f).build();
+//					csvwriter.writeAll(GArray);
+					try {
+						FileWriter fr = new FileWriter(f, true);
+						BufferedWriter out = new BufferedWriter(fr);
+							out.write(datastringM);
+							out.newLine();
+							out.flush();
+							out.close();
+					}
+				    catch (IOException e) {
+				        System.out.println("Exception");
+				    } 
+
+					break;
+				case Sensor.TYPE_LIGHT:
+					Lview.setText("light_intensity: " + event.values[0]);
 					
-//					String datastringM = "M: " +","+ Float.toString(event.values[0]) + "," + Float.toString(event.values[1]) + "," + Float.toString(event.values[2])+","+String.valueOf(etime);
-//				//	GArray.add(datastringM);
-//					
-////					//Writer out = new FileWriter("sensordata1.csv");
-////					
-////					CSVWriter<Float> csvwriter = new CSVWriterBuilder<Float>(f).build();
-////					csvwriter.writeAll(GArray);
-//					try {
-//						FileWriter fr = new FileWriter(f, true);
-//						BufferedWriter out = new BufferedWriter(fr);
-//							out.write(datastringM);
-//							out.newLine();
-//							out.flush();
-//							out.close();
-//					}
-//				    catch (IOException e) {
-//				        System.out.println("Exception");
-//				    } 
-//
-//					break;
-//				case Sensor.TYPE_LIGHT:
-//					Lview.setText("light_intensity: " + event.values[0]);
-					
-//					String datastringL = "L:,"+Float.toString(event.values[0])+","+ Long.toString(etime);
-//					System.out.println(datastringL);
-//				//	GArray.add(datastringL);
-//					try {
-//						FileWriter fr = new FileWriter(f, true);
-//						BufferedWriter out = new BufferedWriter(fr);
-//							out.write(datastringL);
-//							out.newLine();
-//							out.flush();
-//							out.close();
-//					}
-//				    catch (IOException e) {
-//				        System.out.println("Exception");
-//				    } 
-//					break;
-//				default:
-//					break;
+					String datastringL = "L:,"+Float.toString(event.values[0])+","+ Long.toString(etime);
+					System.out.println(datastringL);
+				//	GArray.add(datastringL);
+					try {
+						FileWriter fr = new FileWriter(f, true);
+						BufferedWriter out = new BufferedWriter(fr);
+							out.write(datastringL);
+							out.newLine();
+							out.flush();
+							out.close();
+					}
+				    catch (IOException e) {
+				        System.out.println("Exception");
+				    } 
+					break;
+				default:
+					break;
 				}
 		}
 	}
@@ -199,6 +209,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 		super.onResume();
 		senseM.registerListener(this, senseM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 				SensorManager.SENSOR_DELAY_FASTEST); //SENSOR_DELAY_FASTEST is the fastest sensing rate available
+
+
 //		senseM.registerListener(this, senseM.getDefaultSensor(Sensor.TYPE_GYROSCOPE), 
 //				SensorManager.SENSOR_DELAY_FASTEST);
 //		senseM.registerListener(this, senseM.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
@@ -213,21 +225,82 @@ public class MainActivity extends Activity implements SensorEventListener {
 		steps = 0;
 		senseM.unregisterListener(this);
 	}
+
+
+	public void testUserStep(){
+		int i = 1;
+		ArrayList<float> maxpoints = new ArrayList<float>();
+		ArrayList<float> minpoints = new ArrayList<float>();
+
+		while (i < samplesize){
+			if(history[i] > history[i-1]){
+				maxpoints.set(i, history[i]);
+			}
+			else if(history[i] < history[i-1]){
+				minpoints.set(i, history[i]);	
+			}
+			i++;		
+		}
+
+		int windowLeft = 0;
+		int windowRight = 4;
+		float variance1, variance2;
+		float stableVariance1 = getVariance(maxpoints, 24, testWindowSize);
+		float stableVariance2 = getVariance(maxpoints, 23, testWindowSize);
+		float stableVariance3 = getVariance(maxpoints, 22, testWindowSize);
+		float stableDiff1 = Math.abs(stableVariance2 - stableVariance1);
+		float stableDiff2 = Math.stableVariance3 - stableVariance2;
+		float stableDiff3 = Math.stableVariance1 - stableVariance3;
+		stableThreshold = (stableVariance1 + stableVariance2 + stableVariance3)/3;
+	}
+
+	public float getMean(ArrayList<float> a, int windowLeft, int windowSize){
+		float sum = 0;
+		for(int i = windowLeft; i < windowSize; i++){
+			sum += a.get(i);
+		}
+		return sum / windowSize;
+	}
+
+    public float getVariance(ArrayList<float> a, int windowLeft, int windowSize){
+        float mean = getMean(a, windowLeft, windowSize);
+        float sum = 0;
+        for(int i = windowLeft; i < windowSize(); i++){
+            sum += Math.pow(Math.abs(mean - a.get(i)), 2);
+        }
+        return sum / (windowSize - 1); // minus 1 is believed to be more accurate
+    }
+
+
 	
-	
-	public void counter(float acc){
+	public void countSteps(float currentValue, float stableThreshold){
 		
-		if (history[0] < thresholdp && history[1] < thresholdp && history[2] < thresholdp && history[3] < thresholdp && history[4] < thresholdp && acc > thresholdp) 				
+		if (history[0] < UpperThreshold && history[1] < UpperThreshold && history[2] < UpperThreshold && history[3] < UpperThreshold && history[4] < UpperThreshold && acc > UpperThreshold) 				
 			doubleturn[0] = 1;
 			
-		if (history[0] > thresholdn && history[1] > thresholdn && history[2] > thresholdn && history[3] > thresholdn && history[4] > thresholdn && acc < thresholdn)
+		if (history[0] > LowerThreshold && history[1] > LowerThreshold && history[2] > LowerThreshold && history[3] > LowerThreshold && history[4] > LowerThreshold && acc < LowerThreshold)
 			doubleturn[1] = 1;
 		
-		if ( (doubleturn[0]==1) && (doubleturn[1]==1)){
+		//only count steps when the walking style is stable
+		int windowLeft = 0;
+		int windowRight = testWindowSize - 1;
+		boolean stable1, stable2;
+
+		variance1 = getVariance(maxpoints, windowLeft, testWindowSize);
+		variance2 = getVariance(maxpoints, windowLeft+1, testWindowSize);		
+		if (Math.abs(variance2-variance1) < stableThreshold)
+			stable1 = true;   
+		variance1 = getVariance(minpoints, windowLeft, testWindowSize);
+		variance2 = getVariance(minpoints, windowLeft+1, testWindowSize);
+		if (Math.abs(variance2-variance1) < stableThreshold)
+			stable2 = true; 
+
+		if ( (doubleturn[0]==1) && (doubleturn[1]==1) && stable1 && stable2){
 			steps++;
-			doubleturn[0] = 0;
-			doubleturn[1] = 0;
 		}
+		doubleturn[0] = 0;
+		doubleturn[1] = 0;
+
 		Cview.setText("Steps so far: " + steps);	
 	}
 	
